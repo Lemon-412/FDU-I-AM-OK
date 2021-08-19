@@ -232,6 +232,9 @@ class AutoReport(FduLogin):
 
 def get_account():
     if 'PASSWORD' in environ.keys() and environ['PASSWORD']:
+        print(environ['USERNAME'])
+        print(environ['EMAIL'])
+        print(environ['SMTP'])
         username, password, email, smtp = environ['USERNAME'], environ['PASSWORD'], environ['EMAIL'], environ['SMTP']
     else:
         with open("local_pass.txt", "r") as FILE:
