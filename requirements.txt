@@ -1,3 +1,4 @@
 selenium
 baidu-aip
 image
+lxml
