@@ -1,0 +1,6 @@
+venv/
+.idea/
+local_pass.txt
+*.log
+account.txt
+.bat
