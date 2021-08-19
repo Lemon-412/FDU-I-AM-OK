@@ -11,6 +11,7 @@ from email.utils import formataddr
 
 class Email:
     def __init__(self, sender, smtp, receiver):
+        assert smtp is not None, "SMTP为空"
         self.__sender = sender
         self.__smtp = smtp
         self.__receiver = receiver
@@ -52,20 +53,13 @@ class Email:
 
 
 class FduLogin:
-    """
-    建立与复旦服务器的会话，执行登录/登出操作
-    _page_init()
-    login()
-    logout()
-    close()
-    """
     UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:76.0) Gcko/20100101 Firefox/76.0"
 
     def __init__(self, user_info, url_login):
         """
         初始化session，及登录信息
         :user_info: 包含学号密码及收信邮箱
-        :login_url: 登录页
+        :url_login: 登录页
         """
         self.session = session()
         self.session.headers['User-Agent'] = self.UA
@@ -88,8 +82,8 @@ class FduLogin:
             self.close()
 
     def login(self):
-        card_info = "正在为" + self.username + "打卡"
-        self.postman.add_line(card_info)
+        # card_info = "正在为" + self.username + "打卡"
+        # self.postman.add_line(card_info)
         page_login = self._page_init()
 
         html = etree.HTML(page_login, etree.HTMLParser())
@@ -119,7 +113,8 @@ class FduLogin:
             self.url_login,
             data=data,
             headers=headers,
-            allow_redirects=False)
+            allow_redirects=False
+        )
 
         if post.status_code == 302:
             info_str = "登录成功"
@@ -153,9 +148,9 @@ class FduLogin:
 
     def sendmail(self):
         self.postman.show_mail()
-        # for elem in ["填报成功", "已提交"]:
-        #     if elem in self.postman.title:
-        #         return
+        for elem in ["填报成功", "已提交"]:
+            if elem in self.postman.title:
+                return
         self.postman.post()
 
 
@@ -172,9 +167,6 @@ class AutoReport(FduLogin):
         self.last_info_position = json_loads(self.last_info['geo_api_info'])['addressComponent']
 
     def report(self):
-        """
-        自动填写平安复日
-        """
         headers = {
             "Host": "zlapp.fudan.edu.cn",
             "Referer": "https://zlapp.fudan.edu.cn/site/ncov/fudanDaily?from=history",
@@ -210,7 +202,7 @@ class AutoReport(FduLogin):
             allow_redirects=False
         )
         save_msg = json_loads(save.text)["m"]
-        self.postman.add_line(save_msg)
+        self.postman.add_line("执行结果：" + save_msg)
 
     def check(self):
         """
@@ -232,9 +224,6 @@ class AutoReport(FduLogin):
 
 def get_account():
     if 'PASSWORD' in environ.keys() and environ['PASSWORD']:
-        print(environ['USERNAME'])
-        print(environ['EMAIL'])
-        print(environ['SMTP'])
         username, password, email, smtp = environ['USERNAME'], environ['PASSWORD'], environ['EMAIL'], environ['SMTP']
     else:
         with open("local_pass.txt", "r") as FILE:
