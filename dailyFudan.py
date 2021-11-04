@@ -284,6 +284,8 @@ if __name__ == '__main__':
         iy_info("平安复旦：今日已提交", gl_info)
     else:
         iy_info("平安复旦：本次提交失败", gl_info)
+        daily_fudan.close()
+        assert False
 
     daily_fudan.close()
     sys_exit()
